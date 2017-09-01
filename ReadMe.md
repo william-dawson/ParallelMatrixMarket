@@ -1,4 +1,5 @@
 # Project Overview
+# THIS PROJECT IS NOT YET AT A RELEASE STAGE
 
 This is a minimal library which can be used for reading and writing the matrix
 market format in parallel using MPI.
