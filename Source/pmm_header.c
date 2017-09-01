@@ -1,9 +1,11 @@
-////////////////////////////////////////////////////////////////////////////////
+/*! \file pmm_header.c
+ \brief Implementation of header routines.
+*/
 #include "pmm_header.h"
 #include <mpi.h>
 #include <stdio.h>
 
-////////////////////////////////////////////////////////////////////////////////
+/******************************************************************************/
 void PrintHeader(PMM_Header header) {
   printf("%%%%MatrixMarket matrix ");
   switch (header.format) {

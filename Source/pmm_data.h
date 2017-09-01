@@ -4,6 +4,7 @@
 #ifndef PMM_DATA_h
 #define PMM_DATA_h
 
+/******************************************************************************/
 /*!
   \struct PMM_Data
   A data structure containing the files data.

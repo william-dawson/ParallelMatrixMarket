@@ -8,6 +8,7 @@
 #include "pmm_header.h"
 #include <stdlib.h>
 
+/******************************************************************************/
 /*! PMM_ReadHeader
   Read in the header information of the matrix market file.
   \param file_name the name of the file to read.
@@ -16,7 +17,8 @@
 */
 int PMM_ReadHeader(char *file_name, MPI_Comm comm, PMM_Header *header);
 
-/*! PMM_ReadData 
+/******************************************************************************/
+/*! PMM_ReadData
   Read in the full data from a matrix market file.
   \param file_name the name of the file to read.
   \param header the matrix market header data computed by ReadHeader.

@@ -4,10 +4,8 @@
 #ifndef WRITEROUTINES_h
 #define WRITEROUTINES_h
 
-/*! Create a matrix market header data structure.
-*/
-void PMM_CreateHeader(PMM_Header& header);
 
+/*************************************************************************/
 /*! Write out a matrix market file.
   \param file_name the name of the file to write to.
   \param header the matrix market header data.

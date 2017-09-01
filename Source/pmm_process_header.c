@@ -1,13 +1,17 @@
-////////////////////////////////////////////////////////////////////////////////
+/*! \file pmm_header.c
+ \brief Implementation of header processing routines.
+*/
+#include "pmm_read_routines.h"
+
 #include <mpi.h>
 #include <stdio.h>
 #include <string.h>
 
-#include "pmm_read_routines.h"
+/******************************************************************************/
 void ProcessInfoLine(char *line, PMM_Header *header);
 int BroadcastHeader(PMM_Header *header, MPI_Comm comm, int rank);
 
-////////////////////////////////////////////////////////////////////////////////
+/******************************************************************************/
 int PMM_ReadHeader(char *file_name, MPI_Comm comm, PMM_Header *header) {
   FILE *fp;
   char line_buffer[1024];
@@ -21,11 +25,11 @@ int PMM_ReadHeader(char *file_name, MPI_Comm comm, PMM_Header *header) {
       fprintf(stderr, "Invalid file: %s\n", file_name);
       return -1;
     } else {
-      // Get The First Line
+      /* Get The First Line */
       fgets(line_buffer, 1024, fp);
       ProcessInfoLine(line_buffer, header);
 
-      // Get the length of the header
+      /* Get the length of the header */
       header->header_length = strlen(line_buffer);
       do {
         fgets(line_buffer, 1024, fp);
@@ -33,31 +37,32 @@ int PMM_ReadHeader(char *file_name, MPI_Comm comm, PMM_Header *header) {
         first_char = line_buffer[0];
       } while (first_char == '%');
 
-      // Get The Matrix Size
+      /* Get The Matrix Size */
       sscanf(line_buffer, "%d %d %ld", &(header->matrix_rows),
              &(header->matrix_columns), &(header->total_elements));
       fclose(fp);
     }
   }
 
-  // Share The Header Info With The Other Processes
+  /* Share The Header Info With The Other Processes */
   BroadcastHeader(header, comm, 0);
 
   return 0;
 }
 
-////////////////////////////////////////////////////////////////////////////////
+
+/******************************************************************************/
 void ProcessInfoLine(char *line, PMM_Header *header) {
   char format[1024];
   char data_type[1024];
   char symmetric[1024];
   char *tokenizer;
 
-  // Extra info
+  /* Extra info */
   tokenizer = strtok(line, " ");
   tokenizer = strtok(NULL, " ");
 
-  // Extract the information.
+  /* Extract the information. */
   tokenizer = strtok(NULL, " ");
   if (strcmp(tokenizer, "coordinate"))
     header->format = COORDINATE;
@@ -85,8 +90,7 @@ void ProcessInfoLine(char *line, PMM_Header *header) {
     header->symmetric = HERMITIAN;
 }
 
-
-////////////////////////////////////////////////////////////////////////////////
+/******************************************************************************/
 int BroadcastHeader(PMM_Header *header, MPI_Comm comm, int rank) {
   MPI_Bcast(&(header->format), 1, MPI_INT, 0, comm);
   MPI_Bcast(&(header->data_type), 1, MPI_INT, 0, comm);
