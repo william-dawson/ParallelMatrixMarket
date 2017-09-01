@@ -2,6 +2,7 @@
 find_package(MPI REQUIRED)
 include_directories(${MPI_INCLUDE_PATH})
 
+include_directories(${CMAKE_SOURCE_DIR}/Source/)
 add_executable(TestDriver test_driver.c)
 target_link_libraries (TestDriver ParallelMatrixMarket ${MPI_LIBRARIES})
 

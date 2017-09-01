@@ -1,20 +1,26 @@
 ////////////////////////////////////////////////////////////////////////////////
+// Standard Headers
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <mpi.h>
 
+// Our Headers
+#include "mmheader.h"
+#include "process_header.h"
+
 ////////////////////////////////////////////////////////////////////////////////
 int main(int argc, char *argv[]) {
   char *input_file, *output_file;
   int rank;
+  MMHeader file_header;
 
   MPI_Init(&argc, &argv);
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
   if (rank == 0)
   {
-    printf("Matrix Market Driver Program");
+    printf("Matrix Market Driver Program\n");
   }
 
   // Process Input
@@ -23,9 +29,14 @@ int main(int argc, char *argv[]) {
     MPI_Abort(MPI_COMM_WORLD, -1);
     return -1;
   }
-
   input_file = malloc(sizeof(char) * strlen(argv[1]));
   output_file = malloc(sizeof(char) * strlen(argv[2]));
+  input_file = argv[1];
+  output_file = argv[2];
+
+  ReadHeader(input_file, &file_header, MPI_COMM_WORLD);
+
+  PrintHeader(file_header);
 
   MPI_Finalize();
   return 0;

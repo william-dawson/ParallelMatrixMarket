@@ -1,5 +1,5 @@
 set(src
-    mmheader.h
+    mmheader.c mmheader.h
     process_header.c process_header.h
 )
 
