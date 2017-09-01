@@ -1,6 +1,12 @@
 ////////////////////////////////////////////////////////////////////////////////
-#include "mmheader.h"
-#include <stdlib.h>
+#ifndef MMDATA_h
+#define MMDATA_h
 
 ////////////////////////////////////////////////////////////////////////////////
-int ReadHeader(char *file_name, MMHeader *header, MPI_Comm comm);
+typdef struct {
+  int* rows;
+  int* columns;
+  float* values;
+} MMValues;
+
+#endif

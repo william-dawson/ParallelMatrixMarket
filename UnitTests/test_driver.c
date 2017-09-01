@@ -1,9 +1,9 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Standard Headers
+#include <mpi.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <mpi.h>
 
 // Our Headers
 #include "mmheader.h"
@@ -18,8 +18,7 @@ int main(int argc, char *argv[]) {
   MPI_Init(&argc, &argv);
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
-  if (rank == 0)
-  {
+  if (rank == 0) {
     printf("Matrix Market Driver Program\n");
   }
 
@@ -34,7 +33,10 @@ int main(int argc, char *argv[]) {
   input_file = argv[1];
   output_file = argv[2];
 
+  // Process The Header
   ReadHeader(input_file, &file_header, MPI_COMM_WORLD);
+
+  // Process The Data
 
   PrintHeader(file_header);
 

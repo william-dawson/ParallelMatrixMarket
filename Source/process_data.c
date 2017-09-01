@@ -1,6 +1,8 @@
 ////////////////////////////////////////////////////////////////////////////////
-#include "mmheader.h"
-#include <stdlib.h>
+#include "process_data.h"
+#include <mpi.h>
 
 ////////////////////////////////////////////////////////////////////////////////
-int ReadHeader(char *file_name, MMHeader *header, MPI_Comm comm);
+int ReadData(char *file_name, MMHeader *header, MMData * data, MPI_Comm comm) {
+  
+}
