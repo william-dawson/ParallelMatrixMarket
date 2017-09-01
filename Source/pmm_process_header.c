@@ -3,12 +3,12 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "process_header.h"
-void ProcessInfoLine(char *line, MMHeader *header);
-int BroadcastHeader(MMHeader *header, MPI_Comm comm, int rank);
+#include "pmm_read_routines.h"
+void ProcessInfoLine(char *line, PMM_Header *header);
+int BroadcastHeader(PMM_Header *header, MPI_Comm comm, int rank);
 
 ////////////////////////////////////////////////////////////////////////////////
-int ReadHeader(char *file_name, MMHeader *header, MPI_Comm comm) {
+int PMM_ReadHeader(char *file_name, MPI_Comm comm, PMM_Header *header) {
   FILE *fp;
   char line_buffer[1024];
   int rank;
@@ -47,7 +47,7 @@ int ReadHeader(char *file_name, MMHeader *header, MPI_Comm comm) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ProcessInfoLine(char *line, MMHeader *header) {
+void ProcessInfoLine(char *line, PMM_Header *header) {
   char format[1024];
   char data_type[1024];
   char symmetric[1024];
@@ -87,7 +87,7 @@ void ProcessInfoLine(char *line, MMHeader *header) {
 
 
 ////////////////////////////////////////////////////////////////////////////////
-int BroadcastHeader(MMHeader *header, MPI_Comm comm, int rank) {
+int BroadcastHeader(PMM_Header *header, MPI_Comm comm, int rank) {
   MPI_Bcast(&(header->format), 1, MPI_INT, 0, comm);
   MPI_Bcast(&(header->data_type), 1, MPI_INT, 0, comm);
   MPI_Bcast(&(header->symmetric), 1, MPI_INT, 0, comm);

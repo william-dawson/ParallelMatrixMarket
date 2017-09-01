@@ -1,10 +1,10 @@
 ////////////////////////////////////////////////////////////////////////////////
-#include "mmheader.h"
+#include "pmm_header.h"
 #include <mpi.h>
 #include <stdio.h>
 
 ////////////////////////////////////////////////////////////////////////////////
-void PrintHeader(MMHeader header) {
+void PrintHeader(PMM_Header header) {
   printf("%%%%MatrixMarket matrix ");
   switch (header.format) {
   case COORDINATE:

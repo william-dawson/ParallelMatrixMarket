@@ -1,11 +1,11 @@
 /*! \file mmdata.h
  \brief This file describes the format of the data this library returns.
 */
-#ifndef MMDATA_h
-#define MMDATA_h
+#ifndef PMM_DATA_h
+#define PMM_DATA_h
 
 /*!
-  \struct MMData
+  \struct PMM_Data
   A data structure containing the files data.
   Whether or not the rows, columns, or values arrays have valid data depends
   on the type of matrix that was read in. For example, if it is a pattern
@@ -26,6 +26,6 @@ typedef struct {
       another.
   */
   float* values;
-} MMData;
+} PMM_Data;
 
 #endif

@@ -6,14 +6,16 @@
 #include <string.h>
 
 // Our Headers
-#include "mmheader.h"
-#include "process_header.h"
+#include "pmm_header.h"
+#include "pmm_data.h"
+#include "pmm_read_routines.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 int main(int argc, char *argv[]) {
   char *input_file, *output_file;
   int rank;
-  MMHeader file_header;
+  PMM_Header file_header;
+  PMM_Data file_data;
 
   MPI_Init(&argc, &argv);
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
@@ -34,11 +36,10 @@ int main(int argc, char *argv[]) {
   output_file = argv[2];
 
   // Process The Header
-  ReadHeader(input_file, &file_header, MPI_COMM_WORLD);
+  PMM_ReadHeader(input_file, MPI_COMM_WORLD, &file_header);
 
   // Process The Data
-
-  PrintHeader(file_header);
+  PMM_ReadData(input_file, file_header, MPI_COMM_WORLD, &file_data);
 
   MPI_Finalize();
   return 0;

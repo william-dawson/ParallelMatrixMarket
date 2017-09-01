@@ -1,17 +1,18 @@
 ////////////////////////////////////////////////////////////////////////////////
-#include "process_data.h"
+#include "pmm_read_routines.h"
 #include <mpi.h>
 
-#include "mmheader.h"
-#include "mmdata.h"
+#include "pmm_header.h"
+#include "pmm_data.h"
 
 ////////////////////////////////////////////////////////////////////////////////
-void ExtractRawText(char *file_name, MMHeader header, \
+void ExtractRawText(char *file_name, PMM_Header header, \
   MPI_Comm comm, char* raw_text);
-void ExtractData(char *raw_text, MMHeader header, MMData * data);
+void ExtractData(char *raw_text, PMM_Header header, PMM_Data * data);
 
 ////////////////////////////////////////////////////////////////////////////////
-int ReadData(char *file_name, MMHeader header, MMData * data, MPI_Comm comm) {
+int PMM_ReadData(char *file_name, PMM_Header header,  MPI_Comm comm,
+  PMM_Data * data) {
   char *raw_text;
   // Get The Raw Text
   ExtractRawText(file_name, header, comm, raw_text);
@@ -21,22 +22,27 @@ int ReadData(char *file_name, MMHeader header, MMData * data, MPI_Comm comm) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ExtractRawText(char *file_name, MMHeader header, \
-  MPI_Comm comm, char* raw_text) {
+void ExtractRawText(char *file_name, PMM_Header header, MPI_Comm comm, \
+  char* raw_text) {
   MPI_File fh;
   MPI_Info info;
   MPI_Offset file_size;
   MPI_Offset local_read_size;
   MPI_Offset local_read_size_plus_buffer;
+  int total_processes;
+  int rank;
+
+  MPI_Comm_rank(comm, &rank);
+  MPI_Comm_size(comm, &total_processes);
 
   MPI_File_open(comm, file_name, MPI_MODE_RDONLY, info, &fh);
-  MPI_File_Get_size(fh, &file_size);
+  MPI_File_get_size(fh, &file_size);
 
   MPI_File_close(&fh);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ExtractData(char *raw_text, MMHeader header, MMData * data)
+void ExtractData(char *raw_text, PMM_Header header, PMM_Data * data)
 {
 
 }
