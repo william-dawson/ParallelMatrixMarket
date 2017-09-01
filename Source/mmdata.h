@@ -3,10 +3,10 @@
 #define MMDATA_h
 
 ////////////////////////////////////////////////////////////////////////////////
-typdef struct {
+typedef struct {
   int* rows;
   int* columns;
   float* values;
-} MMValues;
+} MMData;
 
 #endif
