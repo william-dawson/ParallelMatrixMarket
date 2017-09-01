@@ -4,4 +4,7 @@
 #include <stdlib.h>
 
 ////////////////////////////////////////////////////////////////////////////////
-int ReadData(char *file_name, MMHeader *header, MMData* data, MPI_Comm comm);
+int ReadData(char *file_name, MMHeader header, MMData* data, MPI_Comm comm);
+
+////////////////////////////////////////////////////////////////////////////////
+int ReadHeader(char *file_name, MMHeader *header, MPI_Comm comm);
