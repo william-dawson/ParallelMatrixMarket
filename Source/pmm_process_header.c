@@ -8,8 +8,8 @@
 #include <string.h>
 
 /******************************************************************************/
-void ProcessInfoLine(char *line, PMM_Header *header);
-int BroadcastHeader(PMM_Header *header, MPI_Comm comm, int rank);
+void PMM_ProcessInfoLine(char *line, PMM_Header *header);
+int PMM_BroadcastHeader(PMM_Header *header, MPI_Comm comm, int rank);
 
 /******************************************************************************/
 int PMM_ReadHeader(char *file_name, MPI_Comm comm, PMM_Header *header) {
@@ -27,7 +27,7 @@ int PMM_ReadHeader(char *file_name, MPI_Comm comm, PMM_Header *header) {
     } else {
       /* Get The First Line */
       fgets(line_buffer, 1024, fp);
-      ProcessInfoLine(line_buffer, header);
+      PMM_ProcessInfoLine(line_buffer, header);
 
       /* Get the length of the header */
       header->header_length = strlen(line_buffer);
@@ -45,14 +45,14 @@ int PMM_ReadHeader(char *file_name, MPI_Comm comm, PMM_Header *header) {
   }
 
   /* Share The Header Info With The Other Processes */
-  BroadcastHeader(header, comm, 0);
+  PMM_BroadcastHeader(header, comm, 0);
 
   return 0;
 }
 
 
 /******************************************************************************/
-void ProcessInfoLine(char *line, PMM_Header *header) {
+void PMM_ProcessInfoLine(char *line, PMM_Header *header) {
   char format[1024];
   char data_type[1024];
   char symmetric[1024];
@@ -91,7 +91,7 @@ void ProcessInfoLine(char *line, PMM_Header *header) {
 }
 
 /******************************************************************************/
-int BroadcastHeader(PMM_Header *header, MPI_Comm comm, int rank) {
+int PMM_BroadcastHeader(PMM_Header *header, MPI_Comm comm, int rank) {
   MPI_Bcast(&(header->format), 1, MPI_INT, 0, comm);
   MPI_Bcast(&(header->data_type), 1, MPI_INT, 0, comm);
   MPI_Bcast(&(header->symmetric), 1, MPI_INT, 0, comm);

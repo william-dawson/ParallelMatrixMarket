@@ -8,23 +8,23 @@
 #include "pmm_data.h"
 
 /******************************************************************************/
-void ExtractRawText(char *file_name, PMM_Header header, \
+void PMM_ExtractRawText(char *file_name, PMM_Header header, \
   MPI_Comm comm, char* raw_text);
-void ExtractData(char *raw_text, PMM_Header header, PMM_Data * data);
+void PMM_ExtractData(char *raw_text, PMM_Header header, PMM_Data * data);
 
 /******************************************************************************/
 int PMM_ReadData(char *file_name, PMM_Header header,  MPI_Comm comm,
   PMM_Data * data) {
   char *raw_text;
   /* Get The Raw Text */
-  ExtractRawText(file_name, header, comm, raw_text);
+  PMM_ExtractRawText(file_name, header, comm, raw_text);
 
   /* Extract The Data */
-  ExtractData(raw_text, header, data);
+  PMM_ExtractData(raw_text, header, data);
 }
 
 /******************************************************************************/
-void ExtractRawText(char *file_name, PMM_Header header, MPI_Comm comm, \
+void PMM_ExtractRawText(char *file_name, PMM_Header header, MPI_Comm comm, \
   char* raw_text) {
   MPI_File fh;
   MPI_Info info;
@@ -44,7 +44,7 @@ void ExtractRawText(char *file_name, PMM_Header header, MPI_Comm comm, \
 }
 
 /******************************************************************************/
-void ExtractData(char *raw_text, PMM_Header header, PMM_Data * data)
+void PMM_ExtractData(char *raw_text, PMM_Header header, PMM_Data * data)
 {
 
 }

@@ -4,7 +4,7 @@ set(src
     pmm_read_routines.h
     pmm_process_data.c
     pmm_process_header.c
-    pmm_write_routines.h
+    pmm_write_routines.c pmm_write_routines.h
 )
 
 find_package(MPI REQUIRED)

@@ -6,7 +6,7 @@
 #include <stdio.h>
 
 /******************************************************************************/
-void PrintHeader(PMM_Header header) {
+void PMM_PrintHeader(PMM_Header header) {
   printf("%%%%MatrixMarket matrix ");
   switch (header.format) {
   case COORDINATE:

@@ -4,6 +4,9 @@
 #ifndef WRITEROUTINES_h
 #define WRITEROUTINES_h
 
+#include "pmm_header.h"
+#include "pmm_data.h"
+#include <mpi.h>
 
 /*************************************************************************/
 /*! Write out a matrix market file.
