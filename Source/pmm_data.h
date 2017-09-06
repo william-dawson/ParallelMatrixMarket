@@ -17,16 +17,16 @@
 */
 typedef struct {
   /*! The number of values being stored.*/
-  int number_of_values;
+  long int number_of_values;
   /*! Row values. */
-  int* rows;
+  long int* rows;
   /*! Column values. */
-  int* columns;
+  long int* columns;
   /*! Value at a given row and column.
       If the data is complex, the real and imaginary part are stored one after
       another.
   */
-  float* values;
+  double* values;
 } PMM_Data;
 
 #endif

@@ -7,98 +7,140 @@
 #include <stdio.h>
 #include <string.h>
 
+extern const int max_line_length;
+
 /******************************************************************************/
-void PMM_ProcessInfoLine(char *line, PMM_Header *header);
+int PMM_ProcessInfoLine(const char *line, PMM_Header *header);
 int PMM_BroadcastHeader(PMM_Header *header, MPI_Comm comm, int rank);
 
 /******************************************************************************/
 int PMM_ReadHeader(char *file_name, MPI_Comm comm, PMM_Header *header) {
   FILE *fp;
-  char line_buffer[1024];
+  char line_buffer[max_line_length];
   int rank;
   char first_char;
+  char *str_error;
+  int error_value = EXIT_SUCCESS;
 
   MPI_Comm_rank(comm, &rank);
   if (rank == 0) {
     fp = fopen(file_name, "r");
     if (fp == NULL) {
       fprintf(stderr, "Invalid file: %s\n", file_name);
-      return -1;
+      return EXIT_FAILURE;
     } else {
       /* Get The First Line */
-      fgets(line_buffer, 1024, fp);
-      PMM_ProcessInfoLine(line_buffer, header);
+      str_error = fgets(line_buffer, max_line_length, fp);
+      if (str_error == NULL) {
+        fprintf(stderr, "Error while reading header\n");
+        return EXIT_FAILURE;
+      }
+      error_value = PMM_ProcessInfoLine(line_buffer, header);
+      if (error_value == EXIT_FAILURE)
+        return error_value;
 
       /* Get the length of the header */
       header->header_length = strlen(line_buffer);
       do {
-        fgets(line_buffer, 1024, fp);
+        str_error = fgets(line_buffer, max_line_length, fp);
+        if (str_error == NULL) {
+          fprintf(stderr, "Error while reading header\n");
+          return EXIT_FAILURE;
+        }
         header->header_length += strlen(line_buffer);
         first_char = line_buffer[0];
       } while (first_char == '%');
 
       /* Get The Matrix Size */
-      sscanf(line_buffer, "%d %d %ld", &(header->matrix_rows),
-             &(header->matrix_columns), &(header->total_elements));
+      error_value =
+          sscanf(line_buffer, "%ld %ld %ld", &(header->matrix_rows),
+                 &(header->matrix_columns), &(header->total_elements));
+      if (error_value != 3) {
+        fprintf(stderr, "Error while reading header size info.\n");
+      } else {
+        error_value = EXIT_SUCCESS;
+      }
       fclose(fp);
     }
   }
 
   /* Share The Header Info With The Other Processes */
-  PMM_BroadcastHeader(header, comm, 0);
+  error_value = PMM_BroadcastHeader(header, comm, 0);
+  if (error_value != EXIT_SUCCESS)
+    return EXIT_FAILURE;
 
-  return 0;
+  return error_value;
 }
 
-
 /******************************************************************************/
-void PMM_ProcessInfoLine(char *line, PMM_Header *header) {
-  char format[1024];
-  char data_type[1024];
-  char symmetric[1024];
+int PMM_ProcessInfoLine(const char * const line, PMM_Header *header) {
+  char format[max_line_length];
+  char data_type[max_line_length];
+  char symmetric[max_line_length];
+  char *line_copy;
   char *tokenizer;
+  int error_value = EXIT_SUCCESS;
+
+  /* Copy the line because strtok is not const */
+  line_copy = line;
 
   /* Extra info */
-  tokenizer = strtok(line, " ");
+  tokenizer = strtok(line_copy, " ");
   tokenizer = strtok(NULL, " ");
 
   /* Extract the information. */
   tokenizer = strtok(NULL, " ");
-  if (strcmp(tokenizer, "coordinate"))
+  if (strcmp(tokenizer, "coordinate") == 0) {
     header->format = COORDINATE;
-  else if (strcmp(tokenizer, "array"))
+  } else if (strcmp(tokenizer, "array") == 0) {
     header->format = ARRAY;
+  } else {
+    fprintf(stderr, "Illegal Matrix Type\n.");
+    return EXIT_FAILURE;
+  }
 
   tokenizer = strtok(NULL, " ");
-  if (strcmp(tokenizer, "real"))
+  if (strcmp(tokenizer, "real") == 0) {
     header->data_type = REAL;
-  else if (strcmp(tokenizer, "integer"))
+  } else if (strcmp(tokenizer, "integer") == 0) {
     header->data_type = INTEGER;
-  else if (strcmp(tokenizer, "complex"))
+  } else if (strcmp(tokenizer, "complex") == 0) {
     header->data_type = COMPLEX;
-  else if (strcmp(tokenizer, "pattern"))
+  } else if (strcmp(tokenizer, "pattern") == 0) {
     header->data_type = PATTERN;
+  } else {
+    fprintf(stderr, "Illegal Matrix Data Type\n.");
+    return EXIT_FAILURE;
+  }
 
   tokenizer = strtok(NULL, " ");
-  if (strcmp(tokenizer, "general"))
+  if (strcmp(tokenizer, "general\n") == 0) {
     header->symmetric = GENERAL;
-  else if (strcmp(tokenizer, "symmetric"))
+  } else if (strcmp(tokenizer, "symmetric\n") == 0) {
     header->symmetric = SYMMETRIC;
-  else if (strcmp(tokenizer, "skew-symmetric"))
+  } else if (strcmp(tokenizer, "skew-symmetric\n") == 0) {
     header->symmetric = SKEWSYMMETRIC;
-  else if (strcmp(tokenizer, "hermitian"))
+  } else if (strcmp(tokenizer, "hermitian\n") == 0) {
     header->symmetric = HERMITIAN;
+  } else {
+    fprintf(stderr, "Illegal Matrix Symmetry Type\n.");
+    return EXIT_FAILURE;
+  }
+
+  return error_value;
 }
 
 /******************************************************************************/
 int PMM_BroadcastHeader(PMM_Header *header, MPI_Comm comm, int rank) {
+  int error_value = EXIT_SUCCESS;
+
   MPI_Bcast(&(header->format), 1, MPI_INT, 0, comm);
   MPI_Bcast(&(header->data_type), 1, MPI_INT, 0, comm);
   MPI_Bcast(&(header->symmetric), 1, MPI_INT, 0, comm);
   MPI_Bcast(&(header->header_length), 1, MPI_INT, 0, comm);
-  MPI_Bcast(&(header->matrix_rows), 1, MPI_INT, 0, comm);
-  MPI_Bcast(&(header->matrix_columns), 1, MPI_INT, 0, comm);
+  MPI_Bcast(&(header->matrix_rows), 1, MPI_LONG, 0, comm);
+  MPI_Bcast(&(header->matrix_columns), 1, MPI_LONG, 0, comm);
   MPI_Bcast(&(header->total_elements), 1, MPI_LONG, 0, comm);
 
-  return 0;
+  return error_value;
 }

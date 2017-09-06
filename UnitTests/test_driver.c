@@ -6,9 +6,10 @@
 #include <string.h>
 
 /* Our Headers */
-#include "pmm_header.h"
 #include "pmm_data.h"
+#include "pmm_header.h"
 #include "pmm_read_routines.h"
+#include "pmm_write_routines.h"
 
 /******************************************************************************/
 int main(int argc, char *argv[]) {
@@ -16,6 +17,7 @@ int main(int argc, char *argv[]) {
   int rank;
   PMM_Header file_header;
   PMM_Data file_data;
+  int error_code;
 
   /* Init */
   MPI_Init(&argc, &argv);
@@ -37,12 +39,21 @@ int main(int argc, char *argv[]) {
   output_file = argv[2];
 
   /* Process The Header */
-  PMM_ReadHeader(input_file, MPI_COMM_WORLD, &file_header);
+  error_code = PMM_ReadHeader(input_file, MPI_COMM_WORLD, &file_header);
+  if (error_code == EXIT_FAILURE) {
+    MPI_Abort(MPI_COMM_WORLD, EXIT_FAILURE);
+  }
 
   /* Process The Data  */
-  PMM_ReadData(input_file, file_header, MPI_COMM_WORLD, &file_data);
+  error_code =
+      PMM_ReadData(input_file, file_header, MPI_COMM_WORLD, &file_data);
+  if (error_code == EXIT_FAILURE) {
+    MPI_Abort(MPI_COMM_WORLD, EXIT_FAILURE);
+  }
 
   /* Now Write Back Out To File */
+  error_code =
+      PMM_WriteData(output_file, file_header, MPI_COMM_WORLD, file_data);
 
   MPI_Finalize();
   return 0;

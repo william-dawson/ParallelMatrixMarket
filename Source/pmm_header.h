@@ -37,9 +37,9 @@ typedef struct {
   /*! > Is the matrix symmetric? */
   PMM_Symmetry symmetric;
   /*! > Number of rows of the matrix. */
-  int matrix_rows;
+  long int matrix_rows;
   /*! > Number of columns of the matrix. */
-  int matrix_columns;
+  long int matrix_columns;
   /*! > Total number of elements in the matrix. */
   long int total_elements;
   /*! > Internal use only.*/
@@ -48,7 +48,7 @@ typedef struct {
 
 /******************************************************************************/
 /*! Create a matrix market header data structure.
-  \param Header data structure to create.
+  \param header data structure to create.
   \param format coordinate or dense.
   \param data_type real, int, etc
   \param symmetric symmetry info
@@ -57,7 +57,7 @@ typedef struct {
   \param total_elements in the entir matrix.
 */
 void PMM_CreateHeader(PMM_Header* header, PMM_Format format, \
-  PMM_DataType data_type, PMM_Symmetry symmetric, int matrix_rows, \
-  int matrix_columns, long int total_elements);
+  PMM_DataType data_type, PMM_Symmetry symmetric, long int matrix_rows, \
+  long int matrix_columns, long int total_elements);
 
 #endif

@@ -47,6 +47,6 @@ void PMM_PrintHeader(PMM_Header header) {
     break;
   }
   printf("\n");
-  printf("%d %d %ld \n", header.matrix_rows, header.matrix_columns,
+  printf("%ld %ld %ld \n", header.matrix_rows, header.matrix_columns,
          header.total_elements);
 }
