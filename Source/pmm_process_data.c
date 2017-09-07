@@ -16,7 +16,7 @@ extern const int max_line_length;
 /******************************************************************************/
 int PMM_ExtractRawText(char *file_name, PMM_Header header, MPI_Comm comm,
                        char **raw_text);
-int PMM_ExtractData(const char *const raw_text, PMM_Header header,
+int PMM_ExtractData(char *raw_text, PMM_Header header,
                     PMM_Data *data);
 
 /******************************************************************************/
@@ -76,6 +76,10 @@ int PMM_ExtractRawText(char *file_name, PMM_Header header, MPI_Comm comm,
   }
 
   read_buffer = (char *)malloc(local_read_size_plus_buffer * sizeof(char));
+  if (read_buffer == NULL) {
+    perror("Extract Raw Text Buffer Malloc");
+    return EXIT_FAILURE;
+  }
 
   /* Perform Actual Read */
   MPI_File_read_at_all(fh, local_start_read, read_buffer,
@@ -102,6 +106,10 @@ int PMM_ExtractRawText(char *file_name, PMM_Header header, MPI_Comm comm,
 
   /* Copy The String Out */
   *raw_text = (char *)malloc((end_char - start_char) * sizeof(char));
+  if (raw_text == NULL) {
+    perror("Extract Raw Text Buffer Malloc");
+    return EXIT_FAILURE;
+  }
   strncpy(*raw_text, read_buffer, end_char - start_char);
 
   free(read_buffer);
@@ -110,7 +118,7 @@ int PMM_ExtractRawText(char *file_name, PMM_Header header, MPI_Comm comm,
 }
 
 /******************************************************************************/
-int PMM_ExtractData(const char *const raw_text, PMM_Header header,
+int PMM_ExtractData(char * raw_text, PMM_Header header,
                     PMM_Data *data) {
   char *temporary_line;
   char *search_pointer;
@@ -129,10 +137,12 @@ int PMM_ExtractData(const char *const raw_text, PMM_Header header,
   /* Allocate The Data*/
   data->rows = (long int *)malloc(data->number_of_values * sizeof(long int));
   if (data->rows == NULL) {
+    perror("Extract Data Malloc");
     return EXIT_FAILURE;
   }
   data->columns = (long int *)malloc(data->number_of_values * sizeof(long int));
   if (data->columns == NULL) {
+    perror("Extract Data Malloc");
     return EXIT_FAILURE;
   }
   if (header.data_type == REAL || header.data_type == INTEGER) {
@@ -142,12 +152,12 @@ int PMM_ExtractData(const char *const raw_text, PMM_Header header,
         (double *)malloc(2 * data->number_of_values * sizeof(double));
   }
   if (data->values == NULL) {
+    perror("Extract Data Malloc");
     return EXIT_FAILURE;
   }
 
   /* Extract The Data */
   search_pointer = raw_text;
-  printf("%s\n", search_pointer);
   temporary_line = strtok(search_pointer, "\n");
   for (i = 0; i < data->number_of_values; ++i) {
     if (header.format == COORDINATE) {

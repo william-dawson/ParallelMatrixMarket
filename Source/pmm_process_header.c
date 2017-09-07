@@ -77,50 +77,50 @@ int PMM_ProcessInfoLine(const char * const line, PMM_Header *header) {
   char format[max_line_length];
   char data_type[max_line_length];
   char symmetric[max_line_length];
-  char *line_copy;
-  char *tokenizer;
+  char line_copy[max_line_length];
+  char *token;
   int error_value = EXIT_SUCCESS;
 
   /* Copy the line because strtok is not const */
-  line_copy = line;
+  strcpy(line_copy,line);
 
   /* Extra info */
-  tokenizer = strtok(line_copy, " ");
-  tokenizer = strtok(NULL, " ");
+  token = strtok(line_copy, " ");
+  token = strtok(NULL, " ");
 
   /* Extract the information. */
-  tokenizer = strtok(NULL, " ");
-  if (strcmp(tokenizer, "coordinate") == 0) {
+  token = strtok(NULL, " ");
+  if (strcmp(token, "coordinate") == 0) {
     header->format = COORDINATE;
-  } else if (strcmp(tokenizer, "array") == 0) {
+  } else if (strcmp(token, "array") == 0) {
     header->format = ARRAY;
   } else {
     fprintf(stderr, "Illegal Matrix Type\n.");
     return EXIT_FAILURE;
   }
 
-  tokenizer = strtok(NULL, " ");
-  if (strcmp(tokenizer, "real") == 0) {
+  token = strtok(NULL, " ");
+  if (strcmp(token, "real") == 0) {
     header->data_type = REAL;
-  } else if (strcmp(tokenizer, "integer") == 0) {
+  } else if (strcmp(token, "integer") == 0) {
     header->data_type = INTEGER;
-  } else if (strcmp(tokenizer, "complex") == 0) {
+  } else if (strcmp(token, "complex") == 0) {
     header->data_type = COMPLEX;
-  } else if (strcmp(tokenizer, "pattern") == 0) {
+  } else if (strcmp(token, "pattern") == 0) {
     header->data_type = PATTERN;
   } else {
     fprintf(stderr, "Illegal Matrix Data Type\n.");
     return EXIT_FAILURE;
   }
 
-  tokenizer = strtok(NULL, " ");
-  if (strcmp(tokenizer, "general\n") == 0) {
+  token = strtok(NULL, " ");
+  if (strcmp(token, "general\n") == 0) {
     header->symmetric = GENERAL;
-  } else if (strcmp(tokenizer, "symmetric\n") == 0) {
+  } else if (strcmp(token, "symmetric\n") == 0) {
     header->symmetric = SYMMETRIC;
-  } else if (strcmp(tokenizer, "skew-symmetric\n") == 0) {
+  } else if (strcmp(token, "skew-symmetric\n") == 0) {
     header->symmetric = SKEWSYMMETRIC;
-  } else if (strcmp(tokenizer, "hermitian\n") == 0) {
+  } else if (strcmp(token, "hermitian\n") == 0) {
     header->symmetric = HERMITIAN;
   } else {
     fprintf(stderr, "Illegal Matrix Symmetry Type\n.");
@@ -134,11 +134,11 @@ int PMM_ProcessInfoLine(const char * const line, PMM_Header *header) {
 int PMM_BroadcastHeader(PMM_Header *header, MPI_Comm comm, int rank) {
   int error_value = EXIT_SUCCESS;
 
-  MPI_Bcast(&(header->format), 1, MPI_INT, 0, comm);
-  MPI_Bcast(&(header->data_type), 1, MPI_INT, 0, comm);
-  MPI_Bcast(&(header->symmetric), 1, MPI_INT, 0, comm);
-  MPI_Bcast(&(header->header_length), 1, MPI_INT, 0, comm);
-  MPI_Bcast(&(header->matrix_rows), 1, MPI_LONG, 0, comm);
+  MPI_Bcast(&(header->format),         1, MPI_INT,  0, comm);
+  MPI_Bcast(&(header->data_type),      1, MPI_INT,  0, comm);
+  MPI_Bcast(&(header->symmetric),      1, MPI_INT,  0, comm);
+  MPI_Bcast(&(header->header_length),  1, MPI_INT,  0, comm);
+  MPI_Bcast(&(header->matrix_rows),    1, MPI_LONG, 0, comm);
   MPI_Bcast(&(header->matrix_columns), 1, MPI_LONG, 0, comm);
   MPI_Bcast(&(header->total_elements), 1, MPI_LONG, 0, comm);
 
