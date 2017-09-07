@@ -14,6 +14,7 @@
   \param header the matrix market header data.
   \param data the matrix market data.
   \param comm the mpi communicator which we're using.
+  \return EXIT_SUCCESS if there are no problems.
 */
 int PMM_WriteData(char *file_name, PMM_Header header, MPI_Comm comm, \
   PMM_Data data);

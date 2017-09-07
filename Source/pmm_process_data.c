@@ -16,8 +16,7 @@ extern const int max_line_length;
 /******************************************************************************/
 int PMM_ExtractRawText(char *file_name, PMM_Header header, MPI_Comm comm,
                        char **raw_text);
-int PMM_ExtractData(char *raw_text, PMM_Header header,
-                    PMM_Data *data);
+int PMM_ExtractData(char *raw_text, PMM_Header header, PMM_Data *data);
 
 /******************************************************************************/
 int PMM_ReadData(char *file_name, PMM_Header header, MPI_Comm comm,
@@ -118,10 +117,11 @@ int PMM_ExtractRawText(char *file_name, PMM_Header header, MPI_Comm comm,
 }
 
 /******************************************************************************/
-int PMM_ExtractData(char * raw_text, PMM_Header header,
-                    PMM_Data *data) {
+int PMM_ExtractData(char *raw_text, PMM_Header header, PMM_Data *data) {
   char *temporary_line;
   char *search_pointer;
+  double* dbl_value_ptr;
+  int* int_value_ptr;
   int error_value = EXIT_SUCCESS;
   long int i;
 
@@ -145,11 +145,15 @@ int PMM_ExtractData(char * raw_text, PMM_Header header,
     perror("Extract Data Malloc");
     return EXIT_FAILURE;
   }
-  if (header.data_type == REAL || header.data_type == INTEGER) {
-    data->values = (double *)malloc(data->number_of_values * sizeof(double));
+  if (header.data_type == REAL) {
+    data->values = (void *)malloc(data->number_of_values * sizeof(double));
+    dbl_value_ptr = data->values;
+  } else if (header.data_type == INTEGER) {
+    data->values = (void *)malloc(data->number_of_values * sizeof(double));
+    int_value_ptr = data->values;
   } else if (header.data_type == COMPLEX) {
-    data->values =
-        (double *)malloc(2 * data->number_of_values * sizeof(double));
+    data->values = (void *)malloc(2 * data->number_of_values * sizeof(double));
+    dbl_value_ptr = data->values;
   }
   if (header.data_type != PATTERN && data->values == NULL) {
     perror("Extract Data Malloc");
@@ -161,23 +165,28 @@ int PMM_ExtractData(char * raw_text, PMM_Header header,
   temporary_line = strtok(search_pointer, "\n");
   for (i = 0; i < data->number_of_values; ++i) {
     if (header.format == COORDINATE) {
-      if (header.data_type == REAL || header.data_type == INTEGER) {
+      if (header.data_type == REAL) {
         sscanf(temporary_line, "%ld %ld %lf", &(data->rows[i]),
-               &(data->columns[i]), &(data->values[i]));
+               &(data->columns[i]), &(dbl_value_ptr[i]));
+      } else if (header.data_type == INTEGER) {
+        sscanf(temporary_line, "%ld %ld %d", &(data->rows[i]),
+               &(data->columns[i]), &(int_value_ptr[i]));
       } else if (header.data_type == COMPLEX) {
         sscanf(temporary_line, "%ld %ld %lf %lf", &(data->rows[i]),
-               &(data->columns[i]), &(data->values[2 * i]),
-               &(data->values[2 * i + 1]));
+               &(data->columns[i]), &(dbl_value_ptr[2 * i]),
+               &(dbl_value_ptr[2 * i + 1]));
       } else if (header.data_type == PATTERN) {
         sscanf(temporary_line, "%ld %ld", &(data->rows[i]),
                &(data->columns[i]));
       }
     } else if (header.format == ARRAY) {
-      if (header.data_type == REAL || header.data_type == INTEGER) {
-        sscanf(temporary_line, "%lf", &(data->values[i]));
+      if (header.data_type == REAL) {
+        sscanf(temporary_line, "%lf", &(dbl_value_ptr[i]));
+      } else if (header.data_type == INTEGER) {
+        sscanf(temporary_line, "%d", &(int_value_ptr[i]));
       } else if (header.data_type == COMPLEX) {
-        sscanf(temporary_line, "%lf %lf", &(data->values[2 * i]),
-               &(data->values[2 * i + 1]));
+        sscanf(temporary_line, "%lf %lf", &(dbl_value_ptr[2 * i]),
+               &(dbl_value_ptr[2 * i + 1]));
       }
     }
     temporary_line = strtok(NULL, "\n");

@@ -26,7 +26,8 @@ typedef enum { GENERAL, SYMMETRIC, SKEWSYMMETRIC, HERMITIAN } PMM_Symmetry;
 
 
 /******************************************************************************/
-/* \struct PMM_Header
+/*!
+   \struct PMM_Header
    A data structure containing the header information from a file.
 */
 typedef struct {
@@ -55,6 +56,7 @@ typedef struct {
   \param matrix_rows of the full matrix.
   \param matrix_columns of the full matrix.
   \param total_elements in the entir matrix.
+  \return EXIT_SUCCESS if there are no problems.
 */
 void PMM_CreateHeader(PMM_Header* header, PMM_Format format, \
   PMM_DataType data_type, PMM_Symmetry symmetric, long int matrix_rows, \

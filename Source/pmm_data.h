@@ -1,4 +1,4 @@
-/*! \file mmdata.h
+/*! \file pmm_data.h
  \brief This file describes the format of the data this library returns.
 */
 #ifndef PMM_DATA_h
@@ -26,12 +26,12 @@ typedef struct {
       If the data is complex, the real and imaginary part are stored one after
       another.
   */
-  double* values;
+  void* values;
 } PMM_Data;
 
 /******************************************************************************/
-/* ! Initialize the PMM_data structure.
-   \param data the data object to initialize.
+/*! Initialize the PMM_data structure.
+  \param data the data object to initialize.
 */
 void InitializePMM_Data(PMM_Data* data);
 

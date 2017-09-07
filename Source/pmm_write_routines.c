@@ -108,15 +108,16 @@ int PMM_CreateDataText(PMM_Header header, PMM_Data data, char **data_text) {
       switch (header.data_type) {
       case REAL:
         sprintf(temp_string, "%ld %ld %lf\n", data.rows[i], data.columns[i],
-                data.values[i]);
+                ((double *)data.values)[i]);
         break;
       case INTEGER:
         sprintf(temp_string, "%ld %ld %d\n", data.rows[i], data.columns[i],
-                (int)data.values[i]);
+                ((int *)data.values)[i]);
         break;
       case COMPLEX:
         sprintf(temp_string, "%ld %ld %lf %lf\n", data.rows[i], data.columns[i],
-                data.values[2 * i], data.values[2 * i + 1]);
+                ((double *)data.values)[2 * i],
+                ((double *)data.values)[2 * i + 1]);
         break;
       case PATTERN:
         sprintf(temp_string, "%ld %ld\n", data.rows[i], data.columns[i]);
@@ -135,15 +136,16 @@ int PMM_CreateDataText(PMM_Header header, PMM_Data data, char **data_text) {
       switch (header.data_type) {
       case REAL:
         sprintf(temp_string, "%ld %ld %lf\n", data.rows[i], data.columns[i],
-                data.values[i]);
+                ((double *)data.values)[i]);
         break;
       case INTEGER:
         sprintf(temp_string, "%ld %ld %d\n", data.rows[i], data.columns[i],
-                (int)data.values[i]);
+                ((int *)data.values)[i]);
         break;
       case COMPLEX:
         sprintf(temp_string, "%ld %ld %lf %lf\n", data.rows[i], data.columns[i],
-                data.values[2 * i], data.values[2 * i + 1]);
+                ((double *)data.values)[2 * i],
+                ((double *)data.values)[2 * i + 1]);
         break;
       case PATTERN:
         sprintf(temp_string, "%ld %ld\n", data.rows[i], data.columns[i]);
