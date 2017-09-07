@@ -45,6 +45,7 @@ int main(int argc, char *argv[]) {
   }
 
   /* Process The Data  */
+  InitializePMM_Data(&file_data);
   error_code =
       PMM_ReadData(input_file, file_header, MPI_COMM_WORLD, &file_data);
   if (error_code == EXIT_FAILURE) {
@@ -54,6 +55,9 @@ int main(int argc, char *argv[]) {
   /* Now Write Back Out To File */
   error_code =
       PMM_WriteData(output_file, file_header, MPI_COMM_WORLD, file_data);
+
+  /* Cleanup */
+  CleanupPMM_Data(&file_data);
 
   MPI_Finalize();
   return 0;

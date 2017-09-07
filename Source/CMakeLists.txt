@@ -1,6 +1,6 @@
 set(src
     pmm_constants.c
-    pmm_data.h
+    pmm_data.c pmm_data.h
     pmm_header.h
     pmm_read_routines.h
     pmm_process_data.c

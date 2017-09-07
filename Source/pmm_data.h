@@ -29,4 +29,16 @@ typedef struct {
   double* values;
 } PMM_Data;
 
+/******************************************************************************/
+/* ! Initialize the PMM_data structure.
+   \param data the data object to initialize.
+*/
+void InitializePMM_Data(PMM_Data* data);
+
+/******************************************************************************/
+/*! Cleanup the PMM_Data structure by freeing the dynamic memory.
+  \param data the data object to cleanup.
+*/
+void CleanupPMM_Data(PMM_Data* data);
+
 #endif

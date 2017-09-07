@@ -29,9 +29,9 @@ int PMM_WriteData(char *file_name, PMM_Header header, MPI_Comm comm,
     return EXIT_FAILURE;
   if (PMM_PerformWrite(file_name, header_text, data_text, comm) != EXIT_SUCCESS)
     return EXIT_FAILURE;
-  //
-  // free(header_text);
-  // free(data_text);
+
+  free(header_text);
+  free(data_text);
 
   return error_value;
 }

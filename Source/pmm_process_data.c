@@ -151,7 +151,7 @@ int PMM_ExtractData(char * raw_text, PMM_Header header,
     data->values =
         (double *)malloc(2 * data->number_of_values * sizeof(double));
   }
-  if (data->values == NULL) {
+  if (header.data_type != PATTERN && data->values == NULL) {
     perror("Extract Data Malloc");
     return EXIT_FAILURE;
   }
