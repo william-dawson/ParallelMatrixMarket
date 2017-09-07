@@ -6,10 +6,14 @@ set(CMAKE_VERBOSE_MAKEFILE ON)
 find_package(MPI REQUIRED)
 
 ################################################################################
+enable_testing()
+
+################################################################################
 ## Output Locations
 set(LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/scratch)
 
 ################################################################################
 ## Documentation

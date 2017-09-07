@@ -107,7 +107,7 @@ int PMM_CreateDataText(PMM_Header header, PMM_Data data, char **data_text) {
     if (header.format == COORDINATE) {
       switch (header.data_type) {
       case REAL:
-        sprintf(temp_string, "%ld %ld %lf\n", data.rows[i], data.columns[i],
+        sprintf(temp_string, "%ld %ld %.10e\n", data.rows[i], data.columns[i],
                 ((double *)data.values)[i]);
         break;
       case INTEGER:
@@ -115,8 +115,8 @@ int PMM_CreateDataText(PMM_Header header, PMM_Data data, char **data_text) {
                 ((int *)data.values)[i]);
         break;
       case COMPLEX:
-        sprintf(temp_string, "%ld %ld %lf %lf\n", data.rows[i], data.columns[i],
-                ((double *)data.values)[2 * i],
+        sprintf(temp_string, "%ld %ld %.10e %.10e\n", data.rows[i],
+                data.columns[i], ((double *)data.values)[2 * i],
                 ((double *)data.values)[2 * i + 1]);
         break;
       case PATTERN:
@@ -135,7 +135,7 @@ int PMM_CreateDataText(PMM_Header header, PMM_Data data, char **data_text) {
     if (header.format == COORDINATE) {
       switch (header.data_type) {
       case REAL:
-        sprintf(temp_string, "%ld %ld %lf\n", data.rows[i], data.columns[i],
+        sprintf(temp_string, "%ld %ld %.10e\n", data.rows[i], data.columns[i],
                 ((double *)data.values)[i]);
         break;
       case INTEGER:
@@ -143,8 +143,8 @@ int PMM_CreateDataText(PMM_Header header, PMM_Data data, char **data_text) {
                 ((int *)data.values)[i]);
         break;
       case COMPLEX:
-        sprintf(temp_string, "%ld %ld %lf %lf\n", data.rows[i], data.columns[i],
-                ((double *)data.values)[2 * i],
+        sprintf(temp_string, "%ld %ld %.10e %.10e\n", data.rows[i],
+                data.columns[i], ((double *)data.values)[2 * i],
                 ((double *)data.values)[2 * i + 1]);
         break;
       case PATTERN:
