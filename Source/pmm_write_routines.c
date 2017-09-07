@@ -7,14 +7,14 @@
 #include <stdlib.h>
 
 /******************************************************************************/
-void PMM_CreateHeaderText(PMM_Header header, char *header_text);
-void PMM_CreateDataText(PMM_Header header, PMM_Data data, char *data_text);
-void PMM_PerformWrite(char * file_name, char *header_text, char *data_text, \
-  MPI_Comm comm);
+int PMM_CreateHeaderText(PMM_Header header, char *header_text);
+int PMM_CreateDataText(PMM_Header header, PMM_Data data, char *data_text);
+int PMM_PerformWrite(char *file_name, char *header_text, char *data_text,
+                      MPI_Comm comm);
 
 /******************************************************************************/
-int PMM_WriteData(char *file_name, PMM_Header header, MPI_Comm comm, \
-  PMM_Data data) {
+int PMM_WriteData(char *file_name, PMM_Header header, MPI_Comm comm,
+                  PMM_Data data) {
   char *header_text;
   char *data_text;
   int error_value = EXIT_SUCCESS;
@@ -28,9 +28,15 @@ int PMM_WriteData(char *file_name, PMM_Header header, MPI_Comm comm, \
   return error_value;
 }
 
-void PMM_PerformWrite(char *file_name, char *header_text, char *data_text, \
-  MPI_Comm comm)
-{
+/******************************************************************************/
+int PMM_CreateHeaderText(PMM_Header header, char *header_text) {}
+
+/******************************************************************************/
+int PMM_CreateDataText(PMM_Header header, PMM_Data data, char *data_text) {}
+
+/******************************************************************************/
+int PMM_PerformWrite(char *file_name, char *header_text, char *data_text,
+                      MPI_Comm comm) {
   MPI_File fh;
   MPI_Info info;
   /* Compute Offsets*/
