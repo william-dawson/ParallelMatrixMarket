@@ -7,8 +7,11 @@ from sys import argv
 
 if __name__ == "__main__":
     matrix_dimension = int(argv[1])
-    matrix_type = argv[2]
-    path = "@CMAKE_BINARY_DIR@/scratch/test-"
+    format_type = argv[2]
+    data_type = argv[3]
+    symmetry_type = argv[4]
+    file_name = argv[5]
+
     test_matrix = csr_matrix(rand(matrix_dimension, matrix_dimension))
-    mmwrite(target=path + matrix_type + ".mtx",
-            a=test_matrix, field=matrix_type)
+
+    mmwrite(target=file_name, a=test_matrix, field=data_type)

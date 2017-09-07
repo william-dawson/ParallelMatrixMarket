@@ -11,6 +11,7 @@ The requirements for this library are:
 * A C Compiler.
 * An MPI Implementation.
 * CMake.
+* Python + Scipy (Optional, For Unit Tests).
 
 Compilation is performed using CMake. Create a build directory, change
 directories to it, and use the cmake command to setup the build.
