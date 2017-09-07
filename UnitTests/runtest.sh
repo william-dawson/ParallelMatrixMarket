@@ -6,6 +6,8 @@ then
 fi
 export PROCESSES="$1"
 
+matrix_size=16
+
 formats=("coordinate", "array")
 types=("real" "complex" "integer" "pattern")
 symmetry=("general", "symmetric", "skewsymmetric", "hermitian")
@@ -22,7 +24,10 @@ do
   dt=${paramarray[1]}
   st=${paramarray[2]}
 
-  @PYTHON_EXECUTABLE@ -W ignore make_test_data.py 16 {$ft} ${dt} ${st} \
+  rm @CMAKE_BINARY_DIR@/scratch/test-${ft}-${dt}-${st}-in.mtx
+  rm @CMAKE_BINARY_DIR@/scratch/test-${ft}-${dt}-${st}-out.mtx
+  @PYTHON_EXECUTABLE@ -W ignore make_test_data.py $matrix_size \
+    {$ft} ${dt} ${st} \
     @CMAKE_BINARY_DIR@/scratch/test-${ft}-${dt}-${st}-in.mtx
   @MPIEXEC@ @MPIEXEC_NUMPROC_FLAG@ $PROCESSES @TESTEXEC@ \
     @CMAKE_BINARY_DIR@/scratch/test-${ft}-${dt}-${st}-in.mtx \

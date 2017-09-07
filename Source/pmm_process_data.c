@@ -23,11 +23,12 @@ int PMM_ReadData(char *file_name, PMM_Header header, MPI_Comm comm,
                  PMM_Data *data) {
   char *raw_text;
   int error_value = EXIT_SUCCESS;
-  /* Get The Raw Text */
-  PMM_ExtractRawText(file_name, header, comm, &raw_text);
 
-  /* Extract The Data */
-  PMM_ExtractData(raw_text, header, data);
+  if (PMM_ExtractRawText(file_name, header, comm, &raw_text) == EXIT_FAILURE)
+    return EXIT_FAILURE;
+
+  if (PMM_ExtractData(raw_text, header, data) == EXIT_FAILURE)
+    return EXIT_FAILURE;
 
   free(raw_text);
 
@@ -50,6 +51,7 @@ int PMM_ExtractRawText(char *file_name, PMM_Header header, MPI_Comm comm,
   int total_processes;
   int rank;
   char *read_buffer;
+  char *buffer_offset;
   int error_value = EXIT_SUCCESS;
 
   MPI_Comm_rank(comm, &rank);
@@ -92,8 +94,9 @@ int PMM_ExtractRawText(char *file_name, PMM_Header header, MPI_Comm comm,
   if (local_read_size > 0) {
     if (rank > 0) {
       while (read_buffer[start_char] != '\n') {
-        start_char = start_char + 1;
+        start_char++;
       }
+      start_char++;
     }
 
     end_char = local_read_size;
@@ -101,16 +104,18 @@ int PMM_ExtractRawText(char *file_name, PMM_Header header, MPI_Comm comm,
            read_buffer[end_char] != '\n') {
       end_char = end_char + 1;
     }
+    end_char++;
   }
+  buffer_offset = read_buffer + start_char;
 
   /* Copy The String Out */
-  *raw_text = (char *)malloc((end_char - start_char) * sizeof(char));
+  *raw_text = (char *)malloc((end_char - start_char + 1) * sizeof(char));
   if (raw_text == NULL) {
     perror("Extract Raw Text Buffer Malloc");
     return EXIT_FAILURE;
   }
-  strncpy(*raw_text, read_buffer, end_char - start_char);
 
+  strncpy(*raw_text, buffer_offset, end_char - start_char);
   free(read_buffer);
 
   return error_value;
