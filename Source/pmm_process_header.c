@@ -52,13 +52,35 @@ int PMM_ReadHeader(char *file_name, MPI_Comm comm, PMM_Header *header) {
       } while (first_char == '%');
 
       /* Get The Matrix Size */
-      error_value =
-          sscanf(line_buffer, "%ld %ld %ld", &(header->matrix_rows),
-                 &(header->matrix_columns), &(header->total_elements));
-      if (error_value != 3) {
-        fprintf(stderr, "Error while reading header size info.\n");
-      } else {
-        error_value = EXIT_SUCCESS;
+      if (header->format == COORDINATE) {
+        error_value =
+            sscanf(line_buffer, "%ld %ld %ld", &(header->matrix_rows),
+                   &(header->matrix_columns), &(header->total_elements));
+        if (error_value != 3) {
+          fprintf(stderr, "Error while reading header size info.\n");
+          return EXIT_FAILURE;
+        }
+      } else if (header->format == ARRAY) {
+        error_value = sscanf(line_buffer, "%ld %ld", &(header->matrix_rows),
+                             &(header->matrix_columns));
+        if (error_value != 2) {
+          fprintf(stderr, "Error while reading header size info.\n");
+          return EXIT_FAILURE;
+        }
+        if (header->symmetric == GENERAL) {
+          header->total_elements = header->matrix_rows * header->matrix_columns;
+        } else if (header->symmetric == SYMMETRIC ||
+                   header->symmetric == HERMITIAN) {
+          header->total_elements =
+              (header->matrix_rows * header->matrix_columns +
+               header->matrix_rows) /
+              2;
+        } else if (header->symmetric == SKEWSYMMETRIC) {
+          header->total_elements =
+              (header->matrix_rows * header->matrix_columns -
+               header->matrix_rows) /
+              2;
+        }
       }
       fclose(fp);
     }
@@ -73,7 +95,7 @@ int PMM_ReadHeader(char *file_name, MPI_Comm comm, PMM_Header *header) {
 }
 
 /******************************************************************************/
-int PMM_ProcessInfoLine(const char * const line, PMM_Header *header) {
+int PMM_ProcessInfoLine(const char *const line, PMM_Header *header) {
   char format[max_line_length];
   char data_type[max_line_length];
   char symmetric[max_line_length];
@@ -82,7 +104,7 @@ int PMM_ProcessInfoLine(const char * const line, PMM_Header *header) {
   int error_value = EXIT_SUCCESS;
 
   /* Copy the line because strtok is not const */
-  strcpy(line_copy,line);
+  strcpy(line_copy, line);
 
   /* Extra info */
   token = strtok(line_copy, " ");
@@ -134,11 +156,11 @@ int PMM_ProcessInfoLine(const char * const line, PMM_Header *header) {
 int PMM_BroadcastHeader(PMM_Header *header, MPI_Comm comm, int rank) {
   int error_value = EXIT_SUCCESS;
 
-  MPI_Bcast(&(header->format),         1, MPI_INT,  0, comm);
-  MPI_Bcast(&(header->data_type),      1, MPI_INT,  0, comm);
-  MPI_Bcast(&(header->symmetric),      1, MPI_INT,  0, comm);
-  MPI_Bcast(&(header->header_length),  1, MPI_INT,  0, comm);
-  MPI_Bcast(&(header->matrix_rows),    1, MPI_LONG, 0, comm);
+  MPI_Bcast(&(header->format), 1, MPI_INT, 0, comm);
+  MPI_Bcast(&(header->data_type), 1, MPI_INT, 0, comm);
+  MPI_Bcast(&(header->symmetric), 1, MPI_INT, 0, comm);
+  MPI_Bcast(&(header->header_length), 1, MPI_INT, 0, comm);
+  MPI_Bcast(&(header->matrix_rows), 1, MPI_LONG, 0, comm);
   MPI_Bcast(&(header->matrix_columns), 1, MPI_LONG, 0, comm);
   MPI_Bcast(&(header->total_elements), 1, MPI_LONG, 0, comm);
 

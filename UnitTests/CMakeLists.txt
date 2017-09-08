@@ -20,7 +20,6 @@ if(BUILD_TESTING)
   configure_file(compare_matrices.py compare_matrices.py @ONLY)
   configure_file(make_test_data.py make_test_data.py @ONLY)
 
-
 ################################################################################
   find_program(BASH_PROGRAM bash)
   add_test(test1 ${BASH_PROGRAM} ${CMAKE_BINARY_DIR}/bin/runtest.sh 1)

@@ -16,7 +16,9 @@ extern const int max_line_length;
 /******************************************************************************/
 int PMM_ExtractRawText(char *file_name, PMM_Header header, MPI_Comm comm,
                        char **raw_text);
-int PMM_ExtractData(char *raw_text, PMM_Header header, PMM_Data *data);
+int PMM_ExtractData(char *raw_text, PMM_Header header, PMM_Data *data,
+                    MPI_Comm comm);
+int CalculateIndices(PMM_Data *data, PMM_Header header, MPI_Comm comm);
 
 /******************************************************************************/
 int PMM_ReadData(char *file_name, PMM_Header header, MPI_Comm comm,
@@ -27,7 +29,7 @@ int PMM_ReadData(char *file_name, PMM_Header header, MPI_Comm comm,
   if (PMM_ExtractRawText(file_name, header, comm, &raw_text) == EXIT_FAILURE)
     return EXIT_FAILURE;
 
-  if (PMM_ExtractData(raw_text, header, data) == EXIT_FAILURE)
+  if (PMM_ExtractData(raw_text, header, data, comm) == EXIT_FAILURE)
     return EXIT_FAILURE;
 
   free(raw_text);
@@ -122,11 +124,12 @@ int PMM_ExtractRawText(char *file_name, PMM_Header header, MPI_Comm comm,
 }
 
 /******************************************************************************/
-int PMM_ExtractData(char *raw_text, PMM_Header header, PMM_Data *data) {
+int PMM_ExtractData(char *raw_text, PMM_Header header, PMM_Data *data,
+                    MPI_Comm comm) {
   char *temporary_line;
   char *search_pointer;
-  double* dbl_value_ptr;
-  int* int_value_ptr;
+  double *dbl_value_ptr;
+  int *int_value_ptr;
   int error_value = EXIT_SUCCESS;
   long int i;
 
@@ -197,5 +200,84 @@ int PMM_ExtractData(char *raw_text, PMM_Header header, PMM_Data *data) {
     temporary_line = strtok(NULL, "\n");
   }
 
+  if (header.format == ARRAY) {
+    CalculateIndices(data, header, comm);
+  }
+
+  return error_value;
+}
+
+/******************************************************************************/
+int CalculateIndices(PMM_Data *data, PMM_Header header, MPI_Comm comm) {
+  long int *elements_per_process;
+  long int index_offset;
+  int rank;
+  int total_processes;
+  long int i;
+  long int start_row, start_column;
+  int error_value = EXIT_SUCCESS;
+
+  MPI_Comm_rank(comm, &rank);
+  MPI_Comm_size(comm, &total_processes);
+
+  /* First we figure out how many elements were read by each process */
+  elements_per_process = (long int *)malloc(sizeof(long int) * total_processes);
+  MPI_Allgather(&(data->number_of_values), 1, MPI_LONG, elements_per_process, 1,
+                MPI_LONG, comm);
+
+  /* Now we can accumulate to determine the first entry */
+  index_offset = 0;
+  for (i = 0; i < rank; ++i) {
+    index_offset += elements_per_process[i];
+  }
+
+  /* Compute The Matrix Indicies */
+  if (header.symmetric == GENERAL) {
+    for (i = 0; i < data->number_of_values; ++i) {
+      data->rows[i] = (index_offset + i) % header.matrix_columns + 1;
+      data->columns[i] = (index_offset + i) / header.matrix_rows + 1;
+    }
+  } else if (header.symmetric == SYMMETRIC || header.symmetric == HERMITIAN) {
+    start_row = 1;
+    start_column = 1;
+    for (i = 0; i < index_offset; ++i) {
+      start_row++;
+      if (start_row > header.matrix_rows) {
+        start_column++;
+        start_row = start_column;
+      }
+    }
+    for (i = 0; i < data->number_of_values; ++i) {
+      data->rows[i] = start_row;
+      data->columns[i] = start_column;
+      start_row++;
+      if (start_row > header.matrix_rows) {
+        start_column++;
+        start_row = start_column;
+      }
+    }
+  } else if (header.symmetric == SKEWSYMMETRIC) {
+    start_row = 2;
+    start_column = 1;
+    for (i = 0; i < index_offset; ++i) {
+      start_row++;
+      if (start_row > header.matrix_rows) {
+        start_column++;
+        start_row = start_column+1;
+      }
+    }
+    for (i = 0; i < data->number_of_values; ++i) {
+      data->rows[i] = start_row;
+      data->columns[i] = start_column;
+      start_row++;
+      if (start_row > header.matrix_rows) {
+        start_column++;
+        start_row = start_column+1;
+      }
+    }
+  }
+
+  /* Cleanup */
+  free(elements_per_process);
   return error_value;
 }

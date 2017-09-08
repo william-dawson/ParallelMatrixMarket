@@ -67,6 +67,8 @@ int main(int argc, char *argv[]) {
   if (rank == 0) {
     printf("  Writing Back To File\n");
   }
+  if (file_header.format == ARRAY)
+    file_header.format = COORDINATE;
   error_code =
       PMM_WriteData(output_file, file_header, MPI_COMM_WORLD, file_data);
 

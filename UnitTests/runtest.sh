@@ -6,16 +6,22 @@ then
 fi
 export PROCESSES="$1"
 
-matrix_size=16
+matrix_size=4
 
 formats=("coordinate", "array")
 types=("real" "complex" "integer" "pattern")
 symmetry=("general", "symmetric", "skewsymmetric", "hermitian")
 
-parameters=("coordinate real general" \
-            "coordinate complex general" \
-            "coordinate integer general" \
-            "coordinate pattern general")
+parameters=(\
+  "coordinate real general" \
+  "coordinate complex general" \
+  "coordinate integer general" \
+  "coordinate pattern general" \
+  "coordinate real symmetric" \
+  "coordinate complex hermitian" \
+  "array real general" \
+  "array real symmetric" \
+)
 
 for param in "${parameters[@]}"
 do
@@ -27,7 +33,7 @@ do
   rm @CMAKE_BINARY_DIR@/scratch/test-${ft}-${dt}-${st}-in.mtx
   rm @CMAKE_BINARY_DIR@/scratch/test-${ft}-${dt}-${st}-out.mtx
   @PYTHON_EXECUTABLE@ -W ignore make_test_data.py $matrix_size \
-    {$ft} ${dt} ${st} \
+    ${ft} ${dt} ${st} \
     @CMAKE_BINARY_DIR@/scratch/test-${ft}-${dt}-${st}-in.mtx
   @MPIEXEC@ @MPIEXEC_NUMPROC_FLAG@ $PROCESSES @TESTEXEC@ \
     @CMAKE_BINARY_DIR@/scratch/test-${ft}-${dt}-${st}-in.mtx \
