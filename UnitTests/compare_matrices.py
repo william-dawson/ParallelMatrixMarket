@@ -20,8 +20,9 @@ if __name__ == "__main__":
 
     if norm(matrix1 - matrix2) > 1e-10:
         stderr.write("Comparison failed.\n")
+        stderr.write("Error value:"+str(norm(matrix1-matrix2)))
         stderr.write(argv[1]+"\n")
         stderr.write(argv[2]+"\n")
         print(matrix1)
         print(matrix2)
-        exit(1)
+        exit(-1)

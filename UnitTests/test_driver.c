@@ -63,6 +63,8 @@ int main(int argc, char *argv[]) {
     MPI_Abort(MPI_COMM_WORLD, EXIT_FAILURE);
   }
 
+  MPI_Barrier(MPI_COMM_WORLD);
+
   /* Now Write Back Out To File */
   if (rank == 0) {
     printf("  Writing Back To File\n");
@@ -71,6 +73,9 @@ int main(int argc, char *argv[]) {
     file_header.format = COORDINATE;
   error_code =
       PMM_WriteData(output_file, file_header, MPI_COMM_WORLD, file_data);
+
+  MPI_Barrier(MPI_COMM_WORLD);
+    MPI_Barrier(MPI_COMM_WORLD);
 
   /* Cleanup */
   if (rank == 0) {

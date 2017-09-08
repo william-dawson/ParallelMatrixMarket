@@ -59,8 +59,17 @@ int PMM_ExtractRawText(char *file_name, PMM_Header header, MPI_Comm comm,
   MPI_Comm_rank(comm, &rank);
   MPI_Comm_size(comm, &total_processes);
 
-  MPI_File_open(comm, file_name, MPI_MODE_RDONLY, MPI_INFO_NULL, &fh);
-  MPI_File_get_size(fh, &total_file_size);
+  error_value =
+      MPI_File_open(comm, file_name, MPI_MODE_RDONLY, MPI_INFO_NULL, &fh);
+  if (error_value != MPI_SUCCESS) {
+    fprintf(stderr, "Failure opening the file to read\n");
+    return EXIT_FAILURE;
+  }
+  error_value = MPI_File_get_size(fh, &total_file_size);
+  if (error_value != MPI_SUCCESS) {
+    fprintf(stderr, "Failure getting file size\n");
+    return EXIT_FAILURE;
+  }
 
   /* Compute Offsets and Amount of Data To Read */
   length_minus_header = total_file_size - header.header_length;
@@ -73,7 +82,7 @@ int PMM_ExtractRawText(char *file_name, PMM_Header header, MPI_Comm comm,
     local_start_read = 0;
     local_read_size = 0;
     local_read_size_plus_buffer = 0;
-  } else if (local_start_read + local_read_size_plus_buffer > total_file_size) {
+  } else if (local_start_read + local_read_size > total_file_size) {
     local_read_size = total_file_size - local_start_read;
     local_read_size_plus_buffer = local_read_size;
   }
@@ -85,10 +94,18 @@ int PMM_ExtractRawText(char *file_name, PMM_Header header, MPI_Comm comm,
   }
 
   /* Perform Actual Read */
-  MPI_File_read_at_all(fh, local_start_read, read_buffer,
-                       local_read_size_plus_buffer, MPI_CHAR, &status);
-
-  MPI_File_close(&fh);
+  error_value =
+      MPI_File_read_at_all(fh, local_start_read, read_buffer,
+                           local_read_size_plus_buffer, MPI_CHAR, &status);
+  if (error_value != MPI_SUCCESS) {
+    fprintf(stderr, "Failure reading the file\n");
+    return EXIT_FAILURE;
+  }
+  error_value = MPI_File_close(&fh);
+  if (error_value != MPI_SUCCESS) {
+    fprintf(stderr, "Failure closing the file to read\n");
+    return EXIT_FAILURE;
+  }
 
   /* Remove Duplicate Data */
   start_char = 0;
@@ -118,8 +135,8 @@ int PMM_ExtractRawText(char *file_name, PMM_Header header, MPI_Comm comm,
   }
 
   strncpy(*raw_text, buffer_offset, end_char - start_char);
-  free(read_buffer);
 
+  free(read_buffer);
   return error_value;
 }
 
@@ -130,8 +147,10 @@ int PMM_ExtractData(char *raw_text, PMM_Header header, PMM_Data *data,
   char *search_pointer;
   double *dbl_value_ptr;
   int *int_value_ptr;
-  int error_value = EXIT_SUCCESS;
   long int i;
+  long int blank_lines;
+  int elements_read;
+  int error_value = EXIT_SUCCESS;
 
   /* Count the number of lines to process */
   data->number_of_values = 0;
@@ -141,6 +160,7 @@ int PMM_ExtractData(char *raw_text, PMM_Header header, PMM_Data *data,
         data->number_of_values++;
     }
   }
+  printf("::::%ld\n", data->number_of_values);
 
   /* Allocate The Data*/
   data->rows = (long int *)malloc(data->number_of_values * sizeof(long int));
@@ -171,30 +191,33 @@ int PMM_ExtractData(char *raw_text, PMM_Header header, PMM_Data *data,
   /* Extract The Data */
   search_pointer = raw_text;
   temporary_line = strtok(search_pointer, "\n");
+  blank_lines = 0;
   for (i = 0; i < data->number_of_values; ++i) {
     if (header.format == COORDINATE) {
       if (header.data_type == REAL) {
-        sscanf(temporary_line, "%ld %ld %lf", &(data->rows[i]),
-               &(data->columns[i]), &(dbl_value_ptr[i]));
+        elements_read = sscanf(temporary_line, "%ld %ld %lf", &(data->rows[i]),
+                               &(data->columns[i]), &(dbl_value_ptr[i]));
       } else if (header.data_type == INTEGER) {
-        sscanf(temporary_line, "%ld %ld %d", &(data->rows[i]),
-               &(data->columns[i]), &(int_value_ptr[i]));
+        elements_read = sscanf(temporary_line, "%ld %ld %d", &(data->rows[i]),
+                               &(data->columns[i]), &(int_value_ptr[i]));
       } else if (header.data_type == COMPLEX) {
-        sscanf(temporary_line, "%ld %ld %lf %lf", &(data->rows[i]),
-               &(data->columns[i]), &(dbl_value_ptr[2 * i]),
-               &(dbl_value_ptr[2 * i + 1]));
+        elements_read =
+            sscanf(temporary_line, "%ld %ld %lf %lf", &(data->rows[i]),
+                   &(data->columns[i]), &(dbl_value_ptr[2 * i]),
+                   &(dbl_value_ptr[2 * i + 1]));
       } else if (header.data_type == PATTERN) {
-        sscanf(temporary_line, "%ld %ld", &(data->rows[i]),
-               &(data->columns[i]));
+        elements_read = sscanf(temporary_line, "%ld %ld", &(data->rows[i]),
+                               &(data->columns[i]));
       }
     } else if (header.format == ARRAY) {
       if (header.data_type == REAL) {
-        sscanf(temporary_line, "%lf", &(dbl_value_ptr[i]));
+        elements_read = sscanf(temporary_line, "%lf", &(dbl_value_ptr[i]));
       } else if (header.data_type == INTEGER) {
-        sscanf(temporary_line, "%d", &(int_value_ptr[i]));
+        elements_read = sscanf(temporary_line, "%d", &(int_value_ptr[i]));
       } else if (header.data_type == COMPLEX) {
-        sscanf(temporary_line, "%lf %lf", &(dbl_value_ptr[2 * i]),
-               &(dbl_value_ptr[2 * i + 1]));
+        elements_read =
+            sscanf(temporary_line, "%lf %lf", &(dbl_value_ptr[2 * i]),
+                   &(dbl_value_ptr[2 * i + 1]));
       }
     }
     temporary_line = strtok(NULL, "\n");
@@ -263,7 +286,7 @@ int CalculateIndices(PMM_Data *data, PMM_Header header, MPI_Comm comm) {
       start_row++;
       if (start_row > header.matrix_rows) {
         start_column++;
-        start_row = start_column+1;
+        start_row = start_column + 1;
       }
     }
     for (i = 0; i < data->number_of_values; ++i) {
@@ -272,7 +295,7 @@ int CalculateIndices(PMM_Data *data, PMM_Header header, MPI_Comm comm) {
       start_row++;
       if (start_row > header.matrix_rows) {
         start_column++;
-        start_row = start_column+1;
+        start_row = start_column + 1;
       }
     }
   }
