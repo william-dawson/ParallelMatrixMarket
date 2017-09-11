@@ -160,7 +160,6 @@ int PMM_ExtractData(char *raw_text, PMM_Header header, PMM_Data *data,
         data->number_of_values++;
     }
   }
-  printf("::::%ld\n", data->number_of_values);
 
   /* Allocate The Data*/
   data->rows = (long int *)malloc(data->number_of_values * sizeof(long int));

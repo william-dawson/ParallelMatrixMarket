@@ -129,12 +129,10 @@ int PMM_CreateDataText(PMM_Header header, PMM_Data data, char **data_text) {
     }
     data_size += strlen(temp_string);
   }
-  printf("Data Size: %ld\n", data_size);
 
-  if (data_size > 0)
-    *data_text = (char *)malloc(sizeof(char) * data_size + 1);
-  else
-    *data_text = (char *)malloc(sizeof(char) * data_size);
+  *data_text = (char *)malloc(sizeof(char) * (data_size + 1));
+  (*data_text)[data_size] = '\0';
+
   for (i = 0; i < data.number_of_values; ++i) {
     if (header.format == COORDINATE) {
       switch (header.data_type) {
@@ -208,7 +206,6 @@ int PMM_PerformWrite(char *file_name, char *header_text, char *data_text,
     MPI_File_write_at(fh, 0, header_text, strlen(header_text), MPI_CHAR,
                       &status);
   }
-  printf("%d length: %ld\n", rank, strlen(data_text));
   /* Data */
   MPI_File_write_at(fh, write_offset, data_text, strlen(data_text), MPI_CHAR,
                     &status);
