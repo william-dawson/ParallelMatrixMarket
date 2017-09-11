@@ -29,6 +29,7 @@ if(BUILD_TESTING)
   add_test(test5 ${BASH_PROGRAM} ${CMAKE_BINARY_DIR}/bin/runtest.sh 5)
   add_test(test6 ${BASH_PROGRAM} ${CMAKE_BINARY_DIR}/bin/runtest.sh 6)
   add_test(test7 ${BASH_PROGRAM} ${CMAKE_BINARY_DIR}/bin/runtest.sh 7)
+  add_test(test16 ${BASH_PROGRAM} ${CMAKE_BINARY_DIR}/bin/runtest.sh 16)
 
 ################################################################################
 endif(BUILD_TESTING)
