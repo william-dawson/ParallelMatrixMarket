@@ -8,7 +8,10 @@ notifications:
 language: C
 
 before_install:
-  - sudo apt-get install -y -q mpich libmpich-dev doxygen cmake python3
+  - sudo apt-get install -y -q mpich libmpich-dev
+  - sudo apt-get install doxygen
+  - sudo apt-get install cmake
+  - sudo apt-get install python3
   - test -n $CC  && unset CC
   - test -n $CXX && unset CXX
   - mkdir build
