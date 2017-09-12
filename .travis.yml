@@ -1,0 +1,8 @@
+language: C
+install: cmake mpicc
+script:
+- mkdir Build
+- cd Build
+- cmake ..
+- make
+- make test
