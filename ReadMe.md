@@ -1,8 +1,15 @@
 # Project Overview
-# THIS PROJECT IS NOT YET AT A RELEASE STAGE
 
 This is a minimal library which can be used for reading and writing the matrix
 market format in parallel using MPI.
+
+## Feature Set
+
+Warning, this project is currently in an alpha release stage. When using this
+library, please perform some independent verification of the results.
+
+Currently we do not support writing the array matrix type, only the coordinate
+type. 
 
 ## How To Build
 
