@@ -1,5 +1,9 @@
 language: C
-install: cmake mpicc
+
+before_install:
+  - test -n $CC  && unset CC
+  - test -n $CXX && unset CXX
+  
 script:
 - mkdir Build
 - cd Build
