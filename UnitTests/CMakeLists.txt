@@ -6,7 +6,7 @@ if(BUILD_TESTING)
   include_directories(${CMAKE_SOURCE_DIR}/Source/)
   add_executable(TestDriver test_driver.c)
   target_link_libraries (TestDriver ParallelMatrixMarket ${MPI_LIBRARIES})
-
+  target_link_libraries(TestDriver m)
   set_target_properties(TestDriver PROPERTIES COMPILE_FLAGS
     "${MPI_COMPILE_FLAGS}")
 
