@@ -16,7 +16,7 @@ if (PythonInterp_FOUND)
   include(CTest)
   enable_testing()
   file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/scratch)
-else
+else()
   message("No testing")
 endif (PythonInterp_FOUND)
 
