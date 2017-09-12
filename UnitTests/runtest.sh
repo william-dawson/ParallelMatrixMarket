@@ -9,35 +9,35 @@ then
 fi
 export PROCESSES="$1"
 
-matrix_size=4
-
 parameters=(\
-  "coordinate real general" \
-  "coordinate complex general" \
-  "coordinate integer general" \
-  "coordinate pattern general" \
-  "coordinate real symmetric" \
-  "coordinate real skew-symmetric" \
-  "coordinate complex hermitian" \
-  "array real general" \
-  "array real symmetric" \
+  "2 coordinate real general" \
+  "4 coordinate real general" \
+  "8 coordinate real general" \
+  "128 coordinate real general" \
+  "128 coordinate complex general" \
+  "128 coordinate integer general" \
+  "128 coordinate pattern general" \
+  "128 coordinate real symmetric" \
+  "128 coordinate real skew-symmetric" \
+  "128 coordinate complex hermitian" \
+  "128 array real general" \
+  "128 array real symmetric" \
 )
 
 for param in "${parameters[@]}"
 do
   paramarray=($param)
-  ft=${paramarray[0]}
-  dt=${paramarray[1]}
-  st=${paramarray[2]}
+  matrix_size=${paramarray[0]}
+  ft=${paramarray[1]}
+  dt=${paramarray[2]}
+  st=${paramarray[3]}
 
   @PYTHON_EXECUTABLE@ -W ignore make_test_data.py $matrix_size \
     ${ft} ${dt} ${st} \
     @CMAKE_BINARY_DIR@/scratch/test-${PROCESSES}-${ft}-${dt}-${st}-in.mtx
-  sleep 1
   @MPIEXEC@ @MPIEXEC_NUMPROC_FLAG@ $PROCESSES @TESTEXEC@ \
     @CMAKE_BINARY_DIR@/scratch/test-${PROCESSES}-${ft}-${dt}-${st}-in.mtx \
     @CMAKE_BINARY_DIR@/scratch/test-${PROCESSES}-${ft}-${dt}-${st}-out.mtx
-  sleep 1
   @PYTHON_EXECUTABLE@ -W ignore compare_matrices.py \
     @CMAKE_BINARY_DIR@/scratch/test-${PROCESSES}-${ft}-${dt}-${st}-in.mtx \
     @CMAKE_BINARY_DIR@/scratch/test-${PROCESSES}-${ft}-${dt}-${st}-out.mtx

@@ -52,6 +52,7 @@ int PMM_ExtractRawText(char *file_name, PMM_Header header, MPI_Comm comm,
   const MPI_Offset min_read_size = max_line_length;
   int total_processes;
   int rank;
+  long int i, j;
   char *read_buffer;
   char *buffer_offset;
   int error_value = EXIT_SUCCESS;
@@ -82,9 +83,12 @@ int PMM_ExtractRawText(char *file_name, PMM_Header header, MPI_Comm comm,
     local_start_read = 0;
     local_read_size = 0;
     local_read_size_plus_buffer = 0;
-  } else if (local_start_read + local_read_size > total_file_size) {
+  } else if (local_start_read + local_read_size > total_file_size &&
+             local_start_read + local_read_size_plus_buffer > total_file_size) {
     local_read_size = total_file_size - local_start_read;
     local_read_size_plus_buffer = local_read_size;
+  } else if (local_start_read + local_read_size_plus_buffer > total_file_size) {
+    local_read_size_plus_buffer = total_file_size - local_start_read;
   }
 
   read_buffer = (char *)malloc(local_read_size_plus_buffer * sizeof(char));
@@ -119,22 +123,26 @@ int PMM_ExtractRawText(char *file_name, PMM_Header header, MPI_Comm comm,
     }
 
     end_char = local_read_size;
-    while (end_char < local_read_size_plus_buffer &&
-           read_buffer[end_char] != '\n') {
-      end_char = end_char + 1;
+    if (local_read_size != local_read_size_plus_buffer) {
+      while (read_buffer[end_char] != '\n') {
+        end_char++;
+      }
+    } else {
+      end_char = local_read_size - 1;
     }
-    end_char++;
   }
-  buffer_offset = read_buffer + start_char;
 
   /* Copy The String Out */
-  *raw_text = (char *)malloc((end_char - start_char + 1) * sizeof(char));
+  *raw_text = (char *)malloc((end_char - start_char + 2) * sizeof(char));
   if (raw_text == NULL) {
     perror("Extract Raw Text Buffer Malloc");
     return EXIT_FAILURE;
   }
 
-  strncpy(*raw_text, buffer_offset, end_char - start_char);
+  for (i = 0; i < end_char - start_char + 1; ++i) {
+    (*raw_text)[i] = read_buffer[start_char + i];
+  }
+  (*raw_text)[ end_char - start_char + 1] = '\0';
 
   free(read_buffer);
   return error_value;
@@ -147,10 +155,11 @@ int PMM_ExtractData(char *raw_text, PMM_Header header, PMM_Data *data,
   char *search_pointer;
   double *dbl_value_ptr;
   int *int_value_ptr;
-  long int i;
+  long int i, j, total_processes;
   long int blank_lines;
   int elements_read;
   int error_value = EXIT_SUCCESS;
+  int rank;
 
   /* Count the number of lines to process */
   data->number_of_values = 0;

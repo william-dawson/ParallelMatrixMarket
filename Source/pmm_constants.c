@@ -3,4 +3,4 @@
 */
 /*! > maximum line length of a matrix market file */
 
-const int max_line_length=81;
+const int max_line_length=1026;
