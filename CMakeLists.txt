@@ -14,6 +14,7 @@ find_package(PythonInterp)
 if (PythonInterp_FOUND)
   include(CTest)
   enable_testing()
+  message("testing enabled")
   file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/scratch)
 endif (PythonInterp_FOUND)
 
