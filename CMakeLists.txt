@@ -12,10 +12,12 @@ endif()
 ################################################################################
 find_package(PythonInterp)
 if (PythonInterp_FOUND)
+  message("testing enabled")
   include(CTest)
   enable_testing()
-  message("testing enabled")
   file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/scratch)
+else
+  message("No testing")
 endif (PythonInterp_FOUND)
 
 ################################################################################
