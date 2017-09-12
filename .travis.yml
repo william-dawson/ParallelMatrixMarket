@@ -7,6 +7,7 @@ env:
   - MPI=mpich
 
 before_install:
+  - sudo apt-get install -y -q mpich libmpich-dev
   - test -n $CC  && unset CC
   - test -n $CXX && unset CXX
   - mkdir build
