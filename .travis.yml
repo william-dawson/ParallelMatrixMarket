@@ -16,3 +16,5 @@ before_install:
 script:
   - cd build
   - cmake ..
+  - make
+  - make test
