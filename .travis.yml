@@ -21,3 +21,4 @@ script:
   - cmake ..
   - make
   - make test
+  - cat bin/runtest.sh
