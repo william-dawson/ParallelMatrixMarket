@@ -12,4 +12,5 @@ before_install:
   - mkdir build
 
 script:
-  - cd build; ls
+  - cd build
+  - cmake ..
