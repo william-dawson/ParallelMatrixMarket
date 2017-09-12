@@ -75,3 +75,6 @@ a suitable data type based on the information in the `PMM_Header`. For complex
 matrices, the real and complex value are stored one after another, so make sure
 to access the values pointer as `[2*index]` and `[2*index+1]` to get the real
 and complex value.
+
+
+[![Build Status](https://travis-ci.org/william-dawson/ParallelMatrixMarket.svg?branch=master)](https://travis-ci.org/william-dawson/ParallelMatrixMarket)
