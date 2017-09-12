@@ -11,11 +11,14 @@ endif()
 
 ################################################################################
 find_package(PythonInterp)
-if (PythonInterp_FOUND)
+if (PYTHONINTERP_FOUND)
+  message("testing enabled")
   include(CTest)
   enable_testing()
   file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/scratch)
-endif (PythonInterp_FOUND)
+else()
+  message("No testing")
+endif (PYTHONINTERP_FOUND)
 
 ################################################################################
 ## Output Locations
