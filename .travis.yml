@@ -4,4 +4,4 @@ before_install:
   - test -n $CC  && unset CC
   - test -n $CXX && unset CXX
 
-script: travis-build.sh
+script: bash travis-build.sh
