@@ -3,10 +3,5 @@ language: C
 before_install:
   - test -n $CC  && unset CC
   - test -n $CXX && unset CXX
-  
-script:
-- mkdir Build
-- cd Build
-- cmake ..
-- make
-- make test
+
+script: travis-build.sh
