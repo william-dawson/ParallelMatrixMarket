@@ -7,8 +7,7 @@ market format in parallel using MPI.
 
 ## Feature Set
 
-Warning, this project is currently in an alpha release stage. When using this
-library, please perform some independent verification of the results.
+Warning, this project is not yet at a release stage.
 
 Currently we do not support writing the array matrix type, only the coordinate
 type. 
