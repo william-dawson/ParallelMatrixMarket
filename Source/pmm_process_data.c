@@ -74,21 +74,28 @@ int PMM_ExtractRawText(char *file_name, PMM_Header header, MPI_Comm comm,
 
   /* Compute Offsets and Amount of Data To Read */
   length_minus_header = total_file_size - header.header_length;
-  local_read_size = fmax(min_read_size, length_minus_header / total_processes);
+  if (min_read_size > length_minus_header/total_processes) {
+    local_read_size = min_read_size;
+  } else {
+    local_read_size = length_minus_header/total_processes;
+  }
   local_read_size_plus_buffer = local_read_size + min_read_size;
   local_start_read = local_read_size * rank + header.header_length;
 
   /* Handle small files */
-  if (local_start_read > total_file_size) {
-    local_start_read = 0;
-    local_read_size = 0;
-    local_read_size_plus_buffer = 0;
-  } else if (local_start_read + local_read_size > total_file_size &&
-             local_start_read + local_read_size_plus_buffer > total_file_size) {
-    local_read_size = total_file_size - local_start_read;
-    local_read_size_plus_buffer = local_read_size;
-  } else if (local_start_read + local_read_size_plus_buffer > total_file_size) {
-    local_read_size_plus_buffer = total_file_size - local_start_read;
+  if (min_read_size*total_processes > total_file_size - header.header_length) {
+    if (rank == 0) {
+      local_read_size = total_file_size - local_start_read;
+      local_read_size_plus_buffer = local_read_size;
+    } else {
+      local_start_read = 0;
+      local_read_size = 0;
+      local_read_size_plus_buffer = 0;
+    }
+  } else {
+    if (local_start_read + local_read_size_plus_buffer > total_file_size) {
+      local_read_size_plus_buffer = total_file_size - local_start_read;;
+    }
   }
 
   read_buffer = (char *)malloc(local_read_size_plus_buffer * sizeof(char));
@@ -142,7 +149,7 @@ int PMM_ExtractRawText(char *file_name, PMM_Header header, MPI_Comm comm,
   for (i = 0; i < end_char - start_char + 1; ++i) {
     (*raw_text)[i] = read_buffer[start_char + i];
   }
-  (*raw_text)[ end_char - start_char + 1] = '\0';
+  (*raw_text)[end_char - start_char + 1] = '\0';
 
   free(read_buffer);
   return error_value;

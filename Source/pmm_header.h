@@ -44,7 +44,7 @@ typedef struct {
   /*! > Total number of elements in the matrix. */
   long int total_elements;
   /*! > Internal use only.*/
-  size_t header_length;
+  int header_length;
 } PMM_Header;
 
 /******************************************************************************/

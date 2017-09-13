@@ -34,11 +34,11 @@ do
 
   @PYTHON_EXECUTABLE@ -W ignore make_test_data.py $matrix_size \
     ${ft} ${dt} ${st} \
-    @CMAKE_BINARY_DIR@/scratch/test-${PROCESSES}-${ft}-${dt}-${st}-in.mtx
+    @CMAKE_BINARY_DIR@/scratch/test-${PROCESSES}-${ft}-${dt}-${st}-${matrix_size}-in.mtx
   @MPIEXEC@ @MPIEXEC_NUMPROC_FLAG@ $PROCESSES @TESTEXEC@ \
-    @CMAKE_BINARY_DIR@/scratch/test-${PROCESSES}-${ft}-${dt}-${st}-in.mtx \
-    @CMAKE_BINARY_DIR@/scratch/test-${PROCESSES}-${ft}-${dt}-${st}-out.mtx
+    @CMAKE_BINARY_DIR@/scratch/test-${PROCESSES}-${ft}-${dt}-${st}-${matrix_size}-in.mtx \
+    @CMAKE_BINARY_DIR@/scratch/test-${PROCESSES}-${ft}-${dt}-${st}-${matrix_size}-out.mtx
   @PYTHON_EXECUTABLE@ -W ignore compare_matrices.py \
-    @CMAKE_BINARY_DIR@/scratch/test-${PROCESSES}-${ft}-${dt}-${st}-in.mtx \
-    @CMAKE_BINARY_DIR@/scratch/test-${PROCESSES}-${ft}-${dt}-${st}-out.mtx
+    @CMAKE_BINARY_DIR@/scratch/test-${PROCESSES}-${ft}-${dt}-${st}-${matrix_size}-in.mtx \
+    @CMAKE_BINARY_DIR@/scratch/test-${PROCESSES}-${ft}-${dt}-${st}-${matrix_size}-out.mtx
 done

@@ -145,7 +145,7 @@ int PMM_ProcessInfoLine(const char *const line, PMM_Header *header) {
   } else if (strcmp(token, "hermitian\n") == 0) {
     header->symmetric = HERMITIAN;
   } else {
-    fprintf(stderr, "Illegal Matrix Symmetry Type\n.");
+    fprintf(stderr, "Illegal Matrix Symmetry Type: %s\n.", token);
     return EXIT_FAILURE;
   }
 
