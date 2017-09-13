@@ -15,6 +15,8 @@
 int main(int argc, char *argv[]) {
   char *input_file, *output_file;
   int rank;
+  double time1, time2;
+  double header_time, data_time, write_time;
   PMM_Header file_header;
   PMM_Data file_data;
   int error_code;
@@ -48,18 +50,25 @@ int main(int argc, char *argv[]) {
   if (rank == 0) {
     printf("  Reading Header\n");
   }
+  time1 = MPI_Wtime();
   error_code = PMM_ReadHeader(input_file, MPI_COMM_WORLD, &file_header);
+  time2 = MPI_Wtime();
+  header_time = time2 - time1;
   if (error_code == EXIT_FAILURE) {
     MPI_Abort(MPI_COMM_WORLD, EXIT_FAILURE);
   }
+  MPI_Barrier(MPI_COMM_WORLD);
 
   /* Process The Data  */
   if (rank == 0) {
     printf("  Reading Data\n");
   }
   InitializePMM_Data(&file_data);
+  time1 = MPI_Wtime();
   error_code =
       PMM_ReadData(input_file, file_header, MPI_COMM_WORLD, &file_data);
+  time2 = MPI_Wtime();
+  data_time = time2 - time1;
   if (error_code == EXIT_FAILURE) {
     MPI_Abort(MPI_COMM_WORLD, EXIT_FAILURE);
   }
@@ -72,17 +81,28 @@ int main(int argc, char *argv[]) {
   }
   if (file_header.format == ARRAY)
     file_header.format = COORDINATE;
+  time1 = MPI_Wtime();
   error_code =
       PMM_WriteData(output_file, file_header, MPI_COMM_WORLD, file_data);
+  time2 = MPI_Wtime();
+  write_time = time2 - time1;
 
   MPI_Barrier(MPI_COMM_WORLD);
-    MPI_Barrier(MPI_COMM_WORLD);
 
   /* Cleanup */
   if (rank == 0) {
     printf("  Cleanup\n");
   }
   CleanupPMM_Data(&file_data);
+
+  /* Print Timers */
+  if (rank == 0) {
+    printf("  Timers:\n");
+    printf("    - Read_Header: %f\n", header_time);
+    printf("    - Read_Data: %f\n", data_time);
+    printf("    - Write: %f\n", write_time);
+  }
+  MPI_Barrier(MPI_COMM_WORLD);
 
   MPI_Finalize();
   return 0;

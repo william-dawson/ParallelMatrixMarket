@@ -6,7 +6,7 @@ set(CMAKE_VERBOSE_MAKEFILE ON)
 find_package(MPI REQUIRED)
 
 if(NOT CMAKE_BUILD_TYPE)
-  set(CMAKE_BUILD_TYPE Release)
+  set(CMAKE_BUILD_TYPE RELEASE)
 endif()
 
 ################################################################################
